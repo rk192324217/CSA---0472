@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
+int main() {
+    // Using fcntl
+    int fd = open("example.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    int flags = fcntl(fd, F_GETFL);
+    fcntl(fd, F_SETFL, flags | O_APPEND);
+
+    // Using lseek
+    off_t offset = lseek(fd, 0, SEEK_END);
+
+    // Using stat
+    struct stat fileStat;
+    stat("example.txt", &fileStat);
+
+    // Using opendir and readdir
+    DIR *dir = opendir(".");
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+    closedir(dir);
+
+    // Clean up
+    close(fd);
+    return 0;
+}
